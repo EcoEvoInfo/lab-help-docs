@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Tips for working on the AHPCC with R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="AHPCC_ENMs_files/libs/clipboard/clipboard.min.js"></script>
+<script src="AHPCC_ENMs_files/libs/quarto-html/quarto.js"></script>
+<script src="AHPCC_ENMs_files/libs/quarto-html/popper.min.js"></script>
+<script src="AHPCC_ENMs_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="AHPCC_ENMs_files/libs/quarto-html/anchor.min.js"></script>
+<link href="AHPCC_ENMs_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="AHPCC_ENMs_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="AHPCC_ENMs_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="AHPCC_ENMs_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="AHPCC_ENMs_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tips for working on the AHPCC with R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="the-ahpcc-r" class="level2">
+<h2 class="anchored" data-anchor-id="the-ahpcc-r">The AHPCC &amp; R</h2>
+<p>The Arkansas High Performance Computing (AHPCC) offers excellent computing resources free of charge for students and faculty at institutions of higher education in Arkansas! However running analyses in R (especially those that require a lot of spatial package dependencies like <code>gdal</code>) can be a challenge. Here are a few tips to help, beyond what can be found on the AHPCC wiki (<a href="https://hpcwiki.uark.edu/doku.php" class="uri">https://hpcwiki.uark.edu/doku.php</a>).</p>
+</section>
+<section id="conda" class="level2">
+<h2 class="anchored" data-anchor-id="conda">Conda</h2>
+<p>The easiest way I have found to use R on the AHPCC is through a <code>conda</code> environment. After connecting to the login node:</p>
+<pre class="{bash}"><code>ssh user@hpc-portal2.hpc.uark.edu</code></pre>
+<p>you can request resources to start an interactive job (e.g.&nbsp;1 hr on the comp01 partition with 10 cpus):</p>
+<pre class="{bash}"><code>srun --nodes=1 --ntasks-per-node=1  --cpus-per-task=10 --partition comp01 --time=1:00:00 --pty /bin/bash </code></pre>
+<p>It is a good idea to start a virtual terminal (e.g.&nbsp;with <code>screen</code>) BEFORE requesting an interactive job.</p>
+<p>After being sent to a worker node to start your job, you will then need to run the following to be able to access <code>conda</code>:</p>
+<pre class="{bash}"><code>source /share/apps/bin/conda-3.10.sh</code></pre>
+<p>Other versions of conda can also be accessed.</p>
+<p>For jobs not run interactively (submitted to the queue), be sure to also include the <code>source /share/apps/bin/conda-3.10.sh</code> line as part of your job submission script.</p>
+<p>After creating a new conda environment, you can install non-R dependencies as usual (e.g.&nbsp;<code>conda install gdal</code>) whereas R packages normally have a <code>r-</code> prefix (e.g.&nbsp;<code>conda install r-rgdal</code>).</p>
+</section>
+<section id="enm" class="level2">
+<h2 class="anchored" data-anchor-id="enm">ENM</h2>
+<p>To run ENMs using MaxEnt algorithm, I typically use the <code>enmeval</code> package. Make sure devtools is installed into your conda environment (<code>conda install r-devtools)</code> and then start your R session. Within R, ENMeval can be installed using <code>devtools::install_github("jamiemkass/ENMeval")</code>.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
