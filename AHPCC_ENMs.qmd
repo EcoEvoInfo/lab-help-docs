@@ -1,6 +1,6 @@
 ---
 title: "Tips for working on the AHPCC with R"
-format: pdf
+format: html
 editor: visual
 ---
 
